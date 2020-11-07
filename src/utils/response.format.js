@@ -1,21 +1,18 @@
-const successResponse = (isSucceeded, status, message, data, input) => {
-  return {
-    success: isSucceeded,
-    status,
+const successResponse = (res, message, data) => {
+  return res.status(200).send({
+    success: true,
     message,
     data,
-    input,
-  };
+  });
 };
 
-const failureResponse = (isSucceeded, status, message, error, input) => {
-  return {
-    success: isSucceeded,
-    status,
+const failureResponse = (res, message, err) => {
+  return res.status(err && err.status ? err.status : 400).send({
+    success: false,
     message,
-    error,
-    input,
-  };
+    error: err,
+    stack: err && err.stack,
+  });
 };
 
 module.exports = { successResponse, failureResponse };

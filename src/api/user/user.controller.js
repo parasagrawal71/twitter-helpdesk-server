@@ -11,12 +11,10 @@ const {
 const getUsers = (req, res) => {
   UserModel.find()
     .then((response) => {
-      res.status(200).send(successResponse(true, 200, "", response, null));
+      successResponse(res, "User List", response);
     })
     .catch((e) => {
-      res
-        .status(e.status)
-        .send(failureResponse(false, e.status, e.message, e, null));
+      failureResponse(res, e.message, e);
     });
 };
 
