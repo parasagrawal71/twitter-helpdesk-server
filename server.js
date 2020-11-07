@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const apiRouter = require("./src/api/api.router");
-require("./src/utils/db.connect");
+// require("./src/utils/db.connect");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
