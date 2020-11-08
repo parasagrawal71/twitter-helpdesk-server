@@ -33,7 +33,7 @@ module.exports.requestToken = (req, res) => {
     url: "https://api.twitter.com/oauth/request_token",
     headers: {
       Authorization: `OAuth oauth_consumer_key="ywkvzrkLoWlJBDu1yYvBOgywg",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1604841931",oauth_nonce="K7ny27JTpKVsTgdyLeDfmQQWVLELj2zAK5BslRsqyw",oauth_version="1.0",oauth_callback="${encodeURIComponent(
-        req.params.origin
+        req.query.origin
       )}",oauth_signature="jV1z4bGB4y1GOXLkTcKossodT8A%3D"`,
     },
   };
