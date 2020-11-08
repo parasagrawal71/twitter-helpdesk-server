@@ -39,11 +39,11 @@ module.exports.requestToken = (req, res) => {
   };
 
   axios(config)
-    .then(function (response) {
+    .then((response) => {
       // console.log(JSON.stringify(response.data));
       return successResponse(res, "Request Token", response);
     })
-    .catch(function (error) {
+    .catch((e) => {
       // console.log(error);
       return failureResponse(res, e.message, e);
     });
