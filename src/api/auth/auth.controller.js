@@ -11,6 +11,7 @@ const {
 module.exports.requestToken = (req, res) => {
   const { query, headers } = req;
   const callbackURL = (query && query.origin) || (headers && headers.origin);
+
   const config = {
     method: "post",
     url: "https://api.twitter.com/oauth/request_token",
