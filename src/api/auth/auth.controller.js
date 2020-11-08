@@ -9,13 +9,18 @@ const {
  * @description Function to request the token to twitter request_token endpoint
  */
 module.exports.requestToken = (req, res) => {
+  const callbackURL = req.query.origin || req.headers.origin;
   const config = {
     method: "post",
     url: "https://api.twitter.com/oauth/request_token",
     headers: {
       Authorization: `OAuth oauth_consumer_key="ywkvzrkLoWlJBDu1yYvBOgywg",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1604841931",oauth_nonce="K7ny27JTpKVsTgdyLeDfmQQWVLELj2zAK5BslRsqyw",oauth_version="1.0",oauth_callback="${encodeURIComponent(
-        req.query.origin || req.headers.origin
-      )}",oauth_signature="jV1z4bGB4y1GOXLkTcKossodT8A%3D"`,
+        callbackURL
+      )}",oauth_signature="${
+        callbackURL === "http://localhost:3000"
+          ? "jV1z4bGB4y1GOXLkTcKossodT8A%3D"
+          : "aLYW38V2vaDPLV7bvD1En6dyGMM%3D"
+      }"`,
     },
   };
 
