@@ -13,11 +13,11 @@ module.exports.requestToken = (req, res) => {
     method: "post",
     url: "https://api.twitter.com/oauth/request_token",
     headers: {
-      Authorization: `OAuth oauth_consumer_key="ywkvzrkLoWlJBDu1yYvBOgywg", oauth_signature_method="HMAC-SHA1", oauth_timestamp="${Math.floor(
+      Authorization: `OAuth oauth_consumer_key="ywkvzrkLoWlJBDu1yYvBOgywg",oauth_signature_method="HMAC-SHA1",oauth_timestamp="${Math.floor(
         Date.now() / 1000
-      )}", oauth_nonce="${randomStr()}", oauth_version="1.0", oauth_callback="${encodeURIComponent(
+      )}",oauth_nonce="${randomStr()}",oauth_version="1.0",oauth_callback="${encodeURIComponent(
         req.query.origin || req.headers.origin
-      )}", oauth_signature="IPkHRKPkxx35K5Xgjf5173oHdJRaUyjZEf1xAocmPVhRsvwBNA"`,
+      )}",oauth_signature="jV1z4bGB4y1GOXLkTcKossodT8A%3D"`,
     },
   };
 
