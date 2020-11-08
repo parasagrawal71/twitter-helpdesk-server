@@ -9,7 +9,8 @@ const {
  * @description Function to request the token to twitter request_token endpoint
  */
 module.exports.requestToken = (req, res) => {
-  const callbackURL = req.query.origin || req.headers.origin;
+  const { query, headers } = req;
+  const callbackURL = (query && query.origin) || (headers && headers.origin);
   const config = {
     method: "post",
     url: "https://api.twitter.com/oauth/request_token",
@@ -27,7 +28,41 @@ module.exports.requestToken = (req, res) => {
   axios(config)
     .then((response) => {
       // console.log(JSON.stringify(response.data));
-      return successResponse(res, "Request Token and Secret", response.data);
+      return successResponse(
+        res,
+        "Request Token and Secret",
+        response && response.data
+      );
+    })
+    .catch((e) => {
+      // console.log(error);
+      return failureResponse(res, e.message, e);
+    });
+};
+
+/**
+ * @function accessToken
+ * @description Function to request the access token to twitter /access_token endpoint
+ */
+module.exports.accessToken = (req, res) => {
+  const { oauth_token, oauth_verifier } = req && req.body;
+  const config = {
+    method: "post",
+    url: "https://api.twitter.com/oauth/access_token",
+    params: {
+      oauth_token,
+      oauth_verifier,
+    },
+  };
+
+  axios(config)
+    .then((response) => {
+      // console.log(JSON.stringify(response.data));
+      return successResponse(
+        res,
+        "Request Acess Token and Access Token Secret",
+        response && response.data
+      );
     })
     .catch((e) => {
       // console.log(error);
