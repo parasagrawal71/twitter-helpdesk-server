@@ -13,9 +13,11 @@ module.exports.requestToken = (req, res) => {
     .request({
       method: "POST",
       url: "https://api.twitter.com/oauth/request_token",
-      Authorization: `OAuth oauth_nonce="${randomStr()}", oauth_callback="http%3A%2F%2Flocalhost%3A3000%2F", oauth_signature_method="HMAC-SHA1", oauth_timestamp="${Math.floor(
-        new Date().getTime() / 1000
-      )}", oauth_consumer_key="JAABlOt9wzw9dyr8SASkPjRrj", oauth_signature="ki0m1aFKtdYisdalDQUOHnfOS0EI5XC1Iez1xbhx0Htox2NwrI", oauth_version="1.0"`,
+      Authorization: `OAuth oauth_nonce="${randomStr()}", oauth_callback="${encodeURIComponent(
+        "https://twitter--helpdesk.herokuapp.com"
+      )}", oauth_signature_method="HMAC-SHA1", oauth_timestamp="${Math.floor(
+        Date.now() / 1000
+      )}", oauth_consumer_key="ywkvzrkLoWlJBDu1yYvBOgywg", oauth_signature="IPkHRKPkxx35K5Xgjf5173oHdJRaUyjZEf1xAocmPVhRsvwBNA", oauth_version="1.0"`,
     })
     .then((response) => {
       // console.log("response: ", response);
