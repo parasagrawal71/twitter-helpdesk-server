@@ -50,7 +50,7 @@ module.exports.accessToken = async (req, res) => {
     if (userData && userData.success) {
       const result = {
         tokenData: response && response.data,
-        currUser: userData.data,
+        currUser: userData.data && userData.data.data,
       };
       return successResponse(
         res,

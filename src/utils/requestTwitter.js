@@ -2,8 +2,7 @@ const axios = require("axios");
 const { getAuthorization } = require("./twitterSignature");
 
 module.exports.requestTwitter = (req, method, url, reqParams = {}) => {
-  console.log("method", req && req.method);
-  console.log("url", req && req.url);
+  console.log("Endpoint: ", req && req.method, req && req.url);
   const authHeaderValue = getAuthorization(
     method && method.toUpperCase(),
     url,
