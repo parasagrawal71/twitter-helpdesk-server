@@ -10,8 +10,7 @@ const failureResponse = (res, message, err) => {
   return res.status(err && err.status ? err.status : 400).send({
     success: false,
     message,
-    error: err,
-    stack: err && err.stack,
+    error: JSON.stringify(err),
   });
 };
 

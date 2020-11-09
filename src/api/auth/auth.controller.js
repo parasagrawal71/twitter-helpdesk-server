@@ -3,70 +3,70 @@ const {
   successResponse,
   failureResponse,
 } = require("../../utils/response.format");
+const { requestTwitter } = require("../../utils/requestTwitter");
 
 /**
  * @function requestToken
  * @description Function to request the token to twitter request_token endpoint
  */
-module.exports.requestToken = (req, res) => {
-  const { query, headers } = req;
-  const callbackURL = (query && query.origin) || (headers && headers.origin);
+module.exports.requestToken = async (req, res) => {
+  const result = await requestTwitter(
+    req,
+    "POST",
+    "https://api.twitter.com/oauth/request_token"
+  );
 
-  const config = {
-    method: "post",
-    url: "https://api.twitter.com/oauth/request_token",
-    headers: {
-      Authorization: `OAuth oauth_consumer_key="ywkvzrkLoWlJBDu1yYvBOgywg",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1604841931",oauth_nonce="K7ny27JTpKVsTgdyLeDfmQQWVLELj2zAK5BslRsqyw",oauth_version="1.0",oauth_callback="${encodeURIComponent(
-        callbackURL
-      )}",oauth_signature="${
-        callbackURL === "http://localhost:3000"
-          ? "jV1z4bGB4y1GOXLkTcKossodT8A%3D"
-          : "aLYW38V2vaDPLV7bvD1En6dyGMM%3D"
-      }"`,
-    },
-  };
-
-  axios(config)
-    .then((response) => {
-      // console.log(JSON.stringify(response.data));
-      return successResponse(
-        res,
-        "Request Token and Secret",
-        response && response.data
-      );
-    })
-    .catch((e) => {
-      // console.log(error);
-      return failureResponse(res, e.message, e);
-    });
+  if (result && result.success) {
+    return successResponse(
+      res,
+      "Request Token and Secret",
+      result && result.data
+    );
+  }
+  return failureResponse(res, result.message, result);
 };
 
 /**
  * @function accessToken
  * @description Function to request the access token to twitter /access_token endpoint
  */
-module.exports.accessToken = (req, res) => {
+module.exports.accessToken = async (req, res) => {
   const { oauth_token, oauth_verifier } = req && req.body;
-  const config = {
+
+  const response = await axios({
     method: "post",
     url: "https://api.twitter.com/oauth/access_token",
     params: {
       oauth_token,
       oauth_verifier,
     },
-  };
+  }).catch((e) => e);
 
-  axios(config)
-    .then((response) => {
-      // console.log(JSON.stringify(response.data));
+  if (response && response.data) {
+    const { data } = response;
+    const screenName = data.split("&")[3].split("=")[1];
+
+    const userData = await fetchUserData(req, screenName).catch((e) => e);
+    if (userData && userData.success) {
+      const result = {
+        tokenData: response && response.data,
+        currUser: userData.data,
+      };
       return successResponse(
         res,
         "Request Acess Token and Access Token Secret",
-        response && response.data
+        result
       );
-    })
-    .catch((e) => {
-      // console.log(error);
-      return failureResponse(res, e.message, e);
-    });
+    }
+  }
+  return failureResponse(res, response.message, response);
+};
+
+const fetchUserData = (req, screenName) => {
+  return requestTwitter(
+    req,
+    "GET",
+    `https://api.twitter.com/2/users/by/username/${screenName}`,
+    { "user.fields": "profile_image_url" }
+  );
 };

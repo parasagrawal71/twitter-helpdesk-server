@@ -1,29 +1,36 @@
 const axios = require("axios");
+const { getAuthorization } = require("./twitterSignature");
 
-module.exports.requestTwitter = (req, method, url) => {
-  const { query, headers } = req;
-  const callbackURL = (query && query.origin) || (headers && headers.origin);
-  const { oauthToken } = query;
+module.exports.requestTwitter = (req, method, url, reqParams = {}) => {
+  console.log("method", req && req.method);
+  console.log("url", req && req.url);
+  const authHeaderValue = getAuthorization(
+    method && method.toUpperCase(),
+    url,
+    reqParams
+  );
 
-  const config = {
-    method,
+  return axios({
+    method: method && method.toLowerCase(),
     url,
     headers: {
-      Authorization: `OAuth oauth_consumer_key="ywkvzrkLoWlJBDu1yYvBOgywg",oauth_token="${oauthToken}",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1604865672",oauth_nonce="5MllfXLkERX",oauth_version="1.0",oauth_signature="${
-        callbackURL === "http://localhost:3000"
-          ? "uilunBvGzeybqQLZDxuxpn6dGpY%3D"
-          : "uilunBvGzeybqQLZDxuxpn6dGpY%3D"
-      }"`,
+      Authorization: authHeaderValue,
     },
-  };
-
-  return axios(config)
+    params: reqParams,
+  })
     .then((response) => {
-      // console.log("response.data", response && response.data);
-      return response;
+      const { data } = response;
+      // console.log("Inside requestTwitter, response.data", data);
+      return {
+        success: true,
+        data,
+      };
     })
     .catch((error) => {
-      // console.log("Inside requestTwitter, Error: ", error && error.message);
-      throw error;
+      console.log("Inside requestTwitter, Error: ", error && error.message);
+      return {
+        success: false,
+        error,
+      };
     });
 };
