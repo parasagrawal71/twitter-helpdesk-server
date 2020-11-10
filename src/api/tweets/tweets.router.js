@@ -1,9 +1,14 @@
 const express = require("express");
-const authRouter = express.Router();
+const tweetRouter = express.Router();
 
 // CONTROLLERS
-const { fetchMentions, replyToTweet } = require("./tweets.controller");
+const {
+  fetchMentions,
+  replyToTweet,
+  searchTweets,
+} = require("./tweets.controller");
 
-authRouter.get("/mentions", fetchMentions);
-authRouter.post("/reply/:id", replyToTweet);
-module.exports = authRouter;
+tweetRouter.get("/mentions", fetchMentions);
+tweetRouter.post("/reply/:id", replyToTweet);
+tweetRouter.get("/search/:screenName", searchTweets);
+module.exports = tweetRouter;
