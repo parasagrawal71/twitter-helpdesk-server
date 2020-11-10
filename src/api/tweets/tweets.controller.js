@@ -18,11 +18,17 @@ module.exports.fetchMentions = async (req, res) => {
 
   if (result && result.success) {
     const { data } = result;
-    const replies = await Promise.all(
+    const currUserScreenName =
+      data[0] &&
+      data[0].entities &&
+      data[0].entities.user_mentions &&
+      data[0].entities.user_mentions.screen_name;
+    let replies = await Promise.all(
       data.map((item) =>
         searchTweetsFunction(req, item.user && item.user.screen_name)
       )
     );
+    replies = [...replies, await searchTweetsFunction(req, currUserScreenName)];
     data.map((item, i) => {
       const tweetId = item.id_str;
       const userReplies = replies[i].filter((reply) => {
