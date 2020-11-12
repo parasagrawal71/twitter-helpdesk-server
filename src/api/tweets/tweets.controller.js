@@ -31,16 +31,19 @@ module.exports.fetchMentions = async (req, res) => {
     replies = [...replies, await searchTweetsFunction(req, currUserScreenName)];
     data.map((item, i) => {
       const tweetId = item.id_str;
-      const userReplies = replies[i].filter((reply) => {
-        if (
-          reply &&
-          reply.referenced_tweets &&
-          reply.referenced_tweets[0] &&
-          reply.referenced_tweets[0].id === tweetId
-        ) {
-          return reply;
-        }
-      });
+      const userReplies =
+        replies &&
+        replies[i] &&
+        replies[i].filter((reply) => {
+          if (
+            reply &&
+            reply.referenced_tweets &&
+            reply.referenced_tweets[0] &&
+            reply.referenced_tweets[0].id === tweetId
+          ) {
+            return reply;
+          }
+        });
       data[i].replies = userReplies;
     });
 
@@ -75,6 +78,10 @@ module.exports.replyToTweet = async (req, res) => {
  * @description Function to search tweets
  */
 const searchTweetsFunction = (req, screenName) => {
+  if (!screenName) {
+    return;
+  }
+
   return requestTwitter(
     req,
     "GET",
@@ -82,7 +89,8 @@ const searchTweetsFunction = (req, screenName) => {
     {
       query: screenName,
       "tweet.fields": "in_reply_to_user_id,referenced_tweets",
-    }
+    },
+    `searchTweets for ${screenName}`
   )
     .then((response) => response && response.data && response.data.data)
     .catch((e) => e);
