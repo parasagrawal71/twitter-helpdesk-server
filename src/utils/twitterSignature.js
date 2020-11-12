@@ -1,11 +1,17 @@
 const keysJson = require("./keys.json");
 const jsSHA = require("jssha");
 
-module.exports.getAuthorization = (httpMethod, baseUrl, reqParams) => {
-  const consumerKey = keysJson.TWITTER_CONSUMER_KEY,
-    consumerSecret = keysJson.TWITTER_CONSUMER_SECRET,
-    accessToken = keysJson.TWITTER_ACCESS_TOKEN,
-    accessTokenSecret = keysJson.TWITTER_ACCESS_TOKEN_SECRET;
+module.exports.getAuthorization = (
+  httpMethod,
+  baseUrl,
+  reqParams,
+  accessToken,
+  accessTokenSecret
+) => {
+  const consumerKey = keysJson.TWITTER_CONSUMER_KEY;
+  const consumerSecret = keysJson.TWITTER_CONSUMER_SECRET;
+  const twitterAccessToken = accessToken ? accessToken : "";
+  const twitterAccessTokenSecret = accessTokenSecret ? accessTokenSecret : "";
 
   const timestamp = Math.round(Date.now() / 1000);
   const nonce = Buffer.from(consumerKey + ":" + timestamp).toString("base64");
@@ -16,11 +22,11 @@ module.exports.getAuthorization = (httpMethod, baseUrl, reqParams) => {
     baseUrl,
     reqParams,
     consumerKey,
-    accessToken,
+    twitterAccessToken,
     timestamp,
     nonce
   );
-  let signingKey = oAuthSigningKey(consumerSecret, accessTokenSecret);
+  let signingKey = oAuthSigningKey(consumerSecret, twitterAccessTokenSecret);
   let signature = oAuthSignature(baseString, signingKey);
   // return interpolated string
   return (
@@ -39,7 +45,7 @@ module.exports.getAuthorization = (httpMethod, baseUrl, reqParams) => {
     timestamp +
     '", ' +
     'oauth_token="' +
-    accessToken +
+    twitterAccessToken +
     '", ' +
     'oauth_version="1.0"'
   );

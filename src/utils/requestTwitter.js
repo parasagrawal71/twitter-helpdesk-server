@@ -6,6 +6,7 @@ module.exports.requestTwitter = (
   method,
   url,
   reqParams = {},
+  accessCreds,
   logEndpoint
 ) => {
   console.log(
@@ -15,7 +16,9 @@ module.exports.requestTwitter = (
   const authHeaderValue = getAuthorization(
     method && method.toUpperCase(),
     url,
-    reqParams
+    reqParams,
+    accessCreds && accessCreds.token,
+    accessCreds && accessCreds.tokenSecret
   );
 
   return axios({

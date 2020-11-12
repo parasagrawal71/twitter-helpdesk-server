@@ -1,4 +1,3 @@
-const axios = require("axios");
 const {
   successResponse,
   failureResponse,
@@ -13,7 +12,9 @@ module.exports.fetchMentions = async (req, res) => {
   const result = await requestTwitter(
     req,
     "get",
-    "https://api.twitter.com/1.1/statuses/mentions_timeline.json"
+    "https://api.twitter.com/1.1/statuses/mentions_timeline.json",
+    {},
+    req && req.query
   );
 
   if (result && result.success) {
@@ -25,10 +26,17 @@ module.exports.fetchMentions = async (req, res) => {
       data[0].entities.user_mentions.screen_name;
     let replies = await Promise.all(
       data.map((item) =>
-        searchTweetsFunction(req, item.user && item.user.screen_name)
+        searchTweetsFunction(
+          req,
+          item.user && item.user.screen_name,
+          req && req.query
+        )
       )
     );
-    replies = [...replies, await searchTweetsFunction(req, currUserScreenName)];
+    replies = [
+      ...replies,
+      await searchTweetsFunction(req, currUserScreenName, req && req.query),
+    ];
     data.map((item, i) => {
       const tweetId = item.id_str;
       const userReplies =
@@ -64,7 +72,8 @@ module.exports.replyToTweet = async (req, res) => {
     req,
     "POST",
     "https://api.twitter.com/1.1/statuses/update.json",
-    { in_reply_to_status_id: id, status }
+    { in_reply_to_status_id: id, status },
+    req && req.query
   );
 
   if (result && result.success) {
@@ -77,7 +86,7 @@ module.exports.replyToTweet = async (req, res) => {
  * @function searchTweetsFunction
  * @description Function to search tweets
  */
-const searchTweetsFunction = (req, screenName) => {
+const searchTweetsFunction = (req, screenName, accessCreds) => {
   if (!screenName) {
     return;
   }
@@ -90,35 +99,9 @@ const searchTweetsFunction = (req, screenName) => {
       query: screenName,
       "tweet.fields": "in_reply_to_user_id,referenced_tweets",
     },
+    accessCreds,
     `searchTweets for ${screenName}`
   )
     .then((response) => response && response.data && response.data.data)
     .catch((e) => e);
-};
-
-/**
- * @function searchTweets
- * @description Function to search tweets
- */
-module.exports.searchTweets = async (req, res) => {
-  const { screenName } = req.params;
-
-  const result = await requestTwitter(
-    req,
-    "GET",
-    "https://api.twitter.com/2/tweets/search/recent",
-    {
-      query: screenName,
-      "tweet.fields": "in_reply_to_user_id,referenced_tweets",
-    }
-  );
-
-  if (result && result.success) {
-    return successResponse(
-      res,
-      "List of matched tweets",
-      result && result.data && result.data.data
-    );
-  }
-  return failureResponse(res, result.message, result);
 };

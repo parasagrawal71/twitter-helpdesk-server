@@ -10,5 +10,4 @@ const {
 
 tweetRouter.get("/mentions", fetchMentions);
 tweetRouter.post("/reply/:id", replyToTweet);
-tweetRouter.get("/search/:screenName", searchTweets);
 module.exports = tweetRouter;

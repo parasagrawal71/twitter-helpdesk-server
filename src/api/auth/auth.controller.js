@@ -44,12 +44,23 @@ module.exports.accessToken = async (req, res) => {
 
   if (response && response.data) {
     const { data } = response;
-    const screenName = data.split("&")[3].split("=")[1];
+    const tempArr = data && data.split("&");
+    const dataArray =
+      tempArr && tempArr.map((item) => item && item.split("=")[1]);
+    const tokenData = {
+      oauth_token: dataArray[0],
+      oauth_token_secret: dataArray[1],
+      user_id: dataArray[2],
+      screen_name: dataArray[3],
+    };
 
-    const userData = await fetchUserData(req, screenName).catch((e) => e);
+    const userData = await fetchUserData(req, dataArray[3], {
+      token: dataArray[0],
+      tokenSecret: dataArray[1],
+    }).catch((e) => e);
     if (userData && userData.success) {
       const result = {
-        tokenData: response && response.data,
+        ...tokenData,
         currUser: userData.data && userData.data.data,
       };
       return successResponse(
@@ -62,11 +73,12 @@ module.exports.accessToken = async (req, res) => {
   return failureResponse(res, response.message, response);
 };
 
-const fetchUserData = (req, screenName) => {
+const fetchUserData = (req, screenName, accessCreds) => {
   return requestTwitter(
     req,
     "GET",
     `https://api.twitter.com/2/users/by/username/${screenName}`,
-    { "user.fields": "profile_image_url" }
+    { "user.fields": "profile_image_url" },
+    accessCreds
   );
 };
