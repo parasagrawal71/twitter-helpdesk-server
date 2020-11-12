@@ -74,7 +74,6 @@ wsServer.on("request", function (request) {
     ) {
       continue;
     }
-    console.log("client");
     const T = new Twit({
       consumer_key: "ywkvzrkLoWlJBDu1yYvBOgywg",
       consumer_secret: "IPkHRKPkxx35K5Xgjf5173oHdJRaUyjZEf1xAocmPVhRsvwBNA",
