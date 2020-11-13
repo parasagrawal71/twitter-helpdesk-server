@@ -3,6 +3,7 @@ const {
   failureResponse,
 } = require("../../utils/response.format");
 const { requestTwitter } = require("../../utils/requestTwitter");
+const _ = require("lodash");
 
 /**
  * @function fetchMentions
@@ -27,7 +28,7 @@ module.exports.fetchMentions = async (req, res) => {
       data[0].entities.user_mentions &&
       data[0].entities.user_mentions[0] &&
       data[0].entities.user_mentions[0].screen_name;
-    let replies = await Promise.all(
+    let repliesArr = await Promise.all(
       data.map((item) =>
         searchTweetsFunction(
           req,
@@ -41,30 +42,53 @@ module.exports.fetchMentions = async (req, res) => {
       currUserScreenName,
       req && req.query
     );
-    replies = [...replies, ...tempReplies, ...currUserReplies];
-    const xtraReplies = [];
-    data.map((item, i) => {
-      const tweetId = item.id_str;
-      const userReplies =
-        replies &&
-        replies[i] &&
-        replies[i].filter((reply) => {
-          if (
-            reply &&
-            reply.referenced_tweets &&
-            reply.referenced_tweets[0] &&
-            reply.referenced_tweets[0].id === tweetId
-          ) {
-            return reply;
-          }
-          xtraReplies.push(reply);
-        });
-      data[i].replies = [...(userReplies ? userReplies : [])];
+
+    let replies = [...tempReplies, ...currUserReplies];
+    repliesArr &&
+      repliesArr.map((arr) => {
+        arr &&
+          arr.map((item) => {
+            replies.push(item);
+          });
+      });
+    const updatedData = data.map((item) => {
+      let updatedItem = updateReplies(item, replies);
+      const updatedReplies = _.uniqBy(updatedItem && updatedItem.replies, "id");
+      updatedItem.replies = updatedReplies;
+      return updatedItem;
     });
 
-    return successResponse(res, "List of mentions", data);
+    return successResponse(res, "List of mentions", updatedData);
   }
   return failureResponse(res, result.message, result);
+};
+
+const updateReplies = (tweet, replies) => {
+  const tweetId = tweet.id_str || tweet.id;
+  const leftReplies = [];
+  const userReplies =
+    replies &&
+    replies.filter((reply) => {
+      if (
+        reply &&
+        reply.referenced_tweets &&
+        reply.referenced_tweets[0] &&
+        reply.referenced_tweets[0].id === tweetId
+      ) {
+        return reply;
+      }
+      leftReplies.push(reply);
+    });
+
+  tweet.replies = userReplies ? userReplies : [];
+
+  if (leftReplies.length) {
+    userReplies.map((ur) => {
+      updateReplies(ur, leftReplies);
+    });
+  }
+
+  return tweet;
 };
 
 /**
