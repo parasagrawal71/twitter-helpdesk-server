@@ -20,8 +20,9 @@ module.exports.fetchMentions = async (req, res) => {
 
   if (result && result.success) {
     let { data } = result;
-    data = data.filter((item) => !item.in_reply_to_status_id_str);
-    const tempReplies = data.filter((item) => item.in_reply_to_status_id_str);
+    data = data && data.filter((item) => !item.in_reply_to_status_id_str);
+    const tempReplies =
+      data && data.filter((item) => item.in_reply_to_status_id_str);
     const currUserScreenName =
       data[0] &&
       data[0].entities &&
@@ -29,13 +30,14 @@ module.exports.fetchMentions = async (req, res) => {
       data[0].entities.user_mentions[0] &&
       data[0].entities.user_mentions[0].screen_name;
     let repliesArr = await Promise.all(
-      data.map((item) =>
-        searchTweetsFunction(
-          req,
-          item.user && item.user.screen_name,
-          req && req.query
+      data &&
+        data.map((item) =>
+          searchTweetsFunction(
+            req,
+            item.user && item.user.screen_name,
+            req && req.query
+          )
         )
-      )
     );
     const currUserReplies = await searchTweetsFunction(
       req,
@@ -43,7 +45,7 @@ module.exports.fetchMentions = async (req, res) => {
       req && req.query
     );
 
-    let replies = [...tempReplies, ...currUserReplies];
+    let replies = [...tempReplies, ...(currUserReplies ? currUserReplies : [])];
     repliesArr &&
       repliesArr.map((arr) => {
         arr &&
@@ -51,12 +53,17 @@ module.exports.fetchMentions = async (req, res) => {
             replies.push(item);
           });
       });
-    const updatedData = data.map((item) => {
-      let updatedItem = updateReplies(item, replies);
-      const updatedReplies = _.uniqBy(updatedItem && updatedItem.replies, "id");
-      updatedItem.replies = updatedReplies;
-      return updatedItem;
-    });
+    const updatedData =
+      data &&
+      data.map((item) => {
+        let updatedItem = updateReplies(item, replies);
+        const updatedReplies = _.uniqBy(
+          updatedItem && updatedItem.replies,
+          "id"
+        );
+        updatedItem.replies = updatedReplies;
+        return updatedItem;
+      });
 
     return successResponse(
       res,
@@ -87,15 +94,19 @@ const updateReplies = (tweet, replies) => {
   tweet.replies = userReplies ? userReplies : [];
 
   if (leftReplies.length) {
-    userReplies.map((ur) => {
-      updateReplies(ur, leftReplies);
-    });
+    userReplies &&
+      userReplies.map((ur) => {
+        updateReplies(ur, leftReplies);
+      });
   }
 
   return tweet;
 };
 
 const sortData = (unsortedData, sortKey, order) => {
+  if (!unsortedData) {
+    return;
+  }
   if (order === "inc") {
     return unsortedData.sort((a, b) => {
       return new Date(b[sortKey]) - new Date(a[sortKey]);
