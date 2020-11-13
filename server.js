@@ -28,6 +28,7 @@ server.listen(webSocketsServerPort);
 const wsServer = new webSocketServer({
   httpServer: server,
   cors: false,
+  autoAcceptConnections: true,
 });
 
 // Generates unique ID for every new connection
