@@ -18,12 +18,15 @@ module.exports.fetchMentions = async (req, res) => {
   );
 
   if (result && result.success) {
-    const { data } = result;
+    let { data } = result;
+    data = data.filter((item) => !item.in_reply_to_status_id_str);
+    const tempReplies = data.filter((item) => item.in_reply_to_status_id_str);
     const currUserScreenName =
       data[0] &&
       data[0].entities &&
       data[0].entities.user_mentions &&
-      data[0].entities.user_mentions.screen_name;
+      data[0].entities.user_mentions[0] &&
+      data[0].entities.user_mentions[0].screen_name;
     let replies = await Promise.all(
       data.map((item) =>
         searchTweetsFunction(
@@ -33,10 +36,13 @@ module.exports.fetchMentions = async (req, res) => {
         )
       )
     );
-    replies = [
-      ...replies,
-      await searchTweetsFunction(req, currUserScreenName, req && req.query),
-    ];
+    const currUserReplies = await searchTweetsFunction(
+      req,
+      currUserScreenName,
+      req && req.query
+    );
+    replies = [...replies, ...tempReplies, ...currUserReplies];
+    const xtraReplies = [];
     data.map((item, i) => {
       const tweetId = item.id_str;
       const userReplies =
@@ -51,8 +57,9 @@ module.exports.fetchMentions = async (req, res) => {
           ) {
             return reply;
           }
+          xtraReplies.push(reply);
         });
-      data[i].replies = userReplies;
+      data[i].replies = [...(userReplies ? userReplies : [])];
     });
 
     return successResponse(res, "List of mentions", data);
@@ -98,6 +105,7 @@ const searchTweetsFunction = (req, screenName, accessCreds) => {
     {
       query: screenName,
       "tweet.fields": "in_reply_to_user_id,referenced_tweets",
+      max_results: 100,
     },
     accessCreds,
     `searchTweets for ${screenName}`
