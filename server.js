@@ -90,9 +90,10 @@ wsServer.on("request", function (request) {
     stream &&
       stream.on("tweet", function (tweet) {
         //   console.log("tweet", tweet);
-        clients[client].connection.sendUTF(
-          JSON.stringify({ type: "NEW_TWEET", data: tweet })
-        );
+        clients[client] &&
+          clients[client].connection.sendUTF(
+            JSON.stringify({ type: "NEW_TWEET", data: tweet })
+          );
       });
   }
 
