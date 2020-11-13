@@ -58,7 +58,11 @@ module.exports.fetchMentions = async (req, res) => {
       return updatedItem;
     });
 
-    return successResponse(res, "List of mentions", updatedData);
+    return successResponse(
+      res,
+      "List of mentions",
+      sortData(updatedData, "created_at", "inc")
+    );
   }
   return failureResponse(res, result.message, result);
 };
@@ -89,6 +93,18 @@ const updateReplies = (tweet, replies) => {
   }
 
   return tweet;
+};
+
+const sortData = (unsortedData, sortKey, order) => {
+  if (order === "inc") {
+    return unsortedData.sort((a, b) => {
+      return new Date(b[sortKey]) - new Date(a[sortKey]);
+    });
+  } else {
+    return unsortedData.sort((a, b) => {
+      return new Date(a[sortKey]) - new Date(b[sortKey]);
+    });
+  }
 };
 
 /**
