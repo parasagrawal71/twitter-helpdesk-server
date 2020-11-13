@@ -68,28 +68,6 @@ module.exports.fetchMentions = async (req, res) => {
 };
 
 /**
- * @function replyToTweet
- * @description Function to reply a tweet
- */
-module.exports.replyToTweet = async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  const result = await requestTwitter(
-    req,
-    "POST",
-    "https://api.twitter.com/1.1/statuses/update.json",
-    { in_reply_to_status_id: id, status },
-    req && req.query
-  );
-
-  if (result && result.success) {
-    return successResponse(res, "Replied successfully", result && result.data);
-  }
-  return failureResponse(res, result.message, result);
-};
-
-/**
  * @function searchTweetsFunction
  * @description Function to search tweets
  */
@@ -112,4 +90,26 @@ const searchTweetsFunction = (req, screenName, accessCreds) => {
   )
     .then((response) => response && response.data && response.data.data)
     .catch((e) => e);
+};
+
+/**
+ * @function replyToTweet
+ * @description Function to reply a tweet
+ */
+module.exports.replyToTweet = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const result = await requestTwitter(
+    req,
+    "POST",
+    "https://api.twitter.com/1.1/statuses/update.json",
+    { in_reply_to_status_id: id, status },
+    req && req.query
+  );
+
+  if (result && result.success) {
+    return successResponse(res, "Replied successfully", result && result.data);
+  }
+  return failureResponse(res, result.message, result);
 };
