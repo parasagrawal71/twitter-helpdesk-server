@@ -1,4 +1,4 @@
-const keysJson = require("./keys.json");
+// const keysJson = require("./keys.json");
 const jsSHA = require("jssha");
 
 module.exports.getAuthorization = (
@@ -8,8 +8,8 @@ module.exports.getAuthorization = (
   accessToken,
   accessTokenSecret
 ) => {
-  const consumerKey = keysJson.TWITTER_CONSUMER_KEY;
-  const consumerSecret = keysJson.TWITTER_CONSUMER_SECRET;
+  const consumerKey = process.env.TWITTER_CONSUMER_KEY; // keysJson.TWITTER_CONSUMER_KEY;
+  const consumerSecret = process.env.TWITTER_CONSUMER_SECRET; // keysJson.TWITTER_CONSUMER_SECRET;
   const twitterAccessToken = accessToken ? accessToken : "";
   const twitterAccessTokenSecret = accessTokenSecret ? accessTokenSecret : "";
 
