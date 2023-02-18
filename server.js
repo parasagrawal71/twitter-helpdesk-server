@@ -15,6 +15,10 @@ app.get("/", (req, res) => {
   res.send("Welcome to Twitter Helpdesk API Server!");
 });
 
+app.get("/health", (req, res) => {
+  res.send("Active");
+});
+
 app.listen(PORT, () => {
   console.log(`Twitter Helpdesk API Server is running on ${PORT}`);
 });
