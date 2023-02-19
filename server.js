@@ -3,7 +3,9 @@ const cors = require("cors");
 require("dotenv").config();
 const bodyParser = require("body-parser");
 const apiRouter = require("./src/api/api.router");
+const keepActive = require("./src/utils/keepActive");
 require("./src/utils/db.connect");
+require("./src/utils/app-logger");
 
 const app = express();
 const PORT = process.env.PORT || 6001;
@@ -36,3 +38,5 @@ process.on("unhandledRejection", (err) => {
   console.log("UNHANDLED REJECTION! Shutting down...");
   process.exit(1);
 });
+
+keepActive();

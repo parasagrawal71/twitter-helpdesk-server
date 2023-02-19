@@ -5,12 +5,14 @@
   "main": "server.js",
   "license": "MIT",
   "scripts": {
-    "start": "forever server.js",
-    "nodemon": "nodemon server.js"
+    "start": "NODE_ENV=production forever server.js",
+    "nodemon": "NODE_ENV=development nodemon server.js"
   },
   "dependencies": {
     "axios": "^0.21.0",
     "body-parser": "^1.19.0",
+    "chalk": "^5.2.0",
+    "cls-rtracer": "^2.6.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.17.1",
@@ -19,8 +21,12 @@
     "jssha": "^3.1.2",
     "lodash": "^4.17.20",
     "mongoose": "^5.9.21",
+    "node-schedule": "^2.1.1",
     "nodemon": "^2.0.4",
     "twit": "^2.2.11",
-    "websocket": "^1.0.32"
+    "util": "^0.12.5",
+    "websocket": "^1.0.32",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }
