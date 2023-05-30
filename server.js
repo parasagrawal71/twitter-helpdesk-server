@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({
+  path: path.join(__dirname, `./.env.${process.env.NODE_ENV}`),
+});
 const bodyParser = require("body-parser");
 const apiRouter = require("./src/api/api.router");
 const keepActive = require("./src/utils/keepActive");
@@ -26,12 +29,12 @@ app.listen(PORT, () => {
   console.log(`Twitter Helpdesk API Server is running on ${PORT}`);
 });
 
-app.all("*", (req, res) => {
-  sendErrorProd(
-    new AppError(`Can't find ${req.originalUrl} on this server!`, 404),
-    res
-  );
-});
+// app.all("*", (req, res) => {
+//   sendErrorProd(
+//     new AppError(`Can't find ${req.originalUrl} on this server!`, 404),
+//     res
+//   );
+// });
 
 process.on("unhandledRejection", (err) => {
   console.log(err.name, err.message);
