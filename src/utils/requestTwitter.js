@@ -13,6 +13,13 @@ module.exports.requestTwitter = (
     "Endpoint: ",
     logEndpoint || `${req && req.method} ${req && req.url}`
   );
+  console.log(`Inside requestTwitter, args; `, {
+    method,
+    url,
+    reqParams,
+    accessCreds,
+    logEndpoint,
+  });
   const authHeaderValue = getAuthorization(
     method && method.toUpperCase(),
     url,
@@ -31,17 +38,18 @@ module.exports.requestTwitter = (
   })
     .then((response) => {
       const { data } = response;
-      // console.log("Inside requestTwitter, response.data", data);
+      console.log("Inside requestTwitter, response.data", data);
       return {
         success: true,
         data,
       };
     })
     .catch((error) => {
-      console.log("Inside requestTwitter, Error: ", error && error.message);
+      console.log("Inside requestTwitter, Error Msg: ", error && error.message);
+      console.log("Inside requestTwitter, Error: ", error);
       return {
         success: false,
-        error,
+        // error,
       };
     });
 };
